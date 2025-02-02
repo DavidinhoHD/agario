@@ -2,8 +2,6 @@ package main
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-
-	"math/rand"
 )
 
 // adds 2 Vector2 objects
@@ -31,16 +29,4 @@ func divideVector2(v1, v2 rl.Vector2) rl.Vector2 {
 	v.Y = v1.Y / v2.Y
 
 	return v
-}
-
-func spawnFood() Food {
-	var f Food
-	x := rand.Int31n(1920)
-	y := rand.Int31n(1080)
-
-	f.posX = x
-	f.posY = y
-	f.radius = 10.0
-
-	return f
 }
