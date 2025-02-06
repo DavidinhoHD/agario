@@ -18,8 +18,8 @@ type Player struct {
 }
 
 type Food struct {
-	radius     float32
-	posX, posY int32
+	radius   float32
+	position rl.Vector2
 }
 
 func (p *Player) DrawPlayer() {
@@ -59,8 +59,8 @@ func spawnFood() Food {
 	x := rand.Int31n(1920)
 	y := rand.Int31n(1080)
 
-	f.posX = x
-	f.posY = y
+	f.position.X = float32(x)
+	f.position.Y = float32(y)
 	f.radius = 10.0
 
 	return f
@@ -76,15 +76,15 @@ func main() {
 	rl.InitWindow(windowWidth, windowHeight, "window title")
 	defer rl.CloseWindow()
 
-	// rl.KeyNull = 0
 	rl.SetExitKey(rl.KeyNull)
 	rl.SetTargetFPS(60)
 
 	player := Player{
 		radius:   30.0,
-		position: rl.Vector2{X: 1920 / 2, Y: 1080 / 2},
+		position: rl.Vector2{X: float32(windowWidth) / 2, Y: float32(windowHeight) / 2},
 		speed:    15,
 	}
+	player.lastDrawPos = player.position
 
 	foods := make([]Food, 0)
 	foods = append(foods, spawnFood())
@@ -93,8 +93,6 @@ func main() {
 	foods = append(foods, spawnFood())
 	foods = append(foods, spawnFood())
 	foods = append(foods, spawnFood())
-
-	player.lastDrawPos = player.position
 
 	backgroundImage := rl.LoadTexture("static/background.png")
 	if backgroundImage.ID == 0 {
@@ -110,14 +108,10 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		camera := rl.Camera2D{
-			// Camera offset (displacement from target)
-			Offset: rl.Vector2{1920 / 2, 1080 / 2},
-			// Camera target (rotation and zoom origin)
-			Target: player.position,
-			// Camera rotation in degrees
+			Offset:   rl.Vector2{X: float32(windowWidth) / 2, Y: float32(windowHeight) / 2},
+			Target:   player.position,
 			Rotation: 0.0,
-			// Camera zoom (scaling), should be 1.0f by default
-			Zoom: 1,
+			Zoom:     1.0,
 		}
 
 		rl.BeginMode2D(camera)
@@ -130,17 +124,14 @@ func main() {
 			}
 		}
 
-		rl.EndMode2D()
-
 		for _, v := range foods {
-			rl.DrawCircle(v.posX, v.posY, v.radius, rl.Green)
+			rl.DrawCircle(int32(v.position.X), int32(v.position.Y), v.radius, rl.Green)
 		}
 
 		player.DrawPlayer()
 		if rl.IsCursorOnScreen() {
 			mouseWorldPos := rl.GetScreenToWorld2D(rl.GetMousePosition(), camera)
 			player.Move(mouseWorldPos, player.speed)
-			fmt.Println(player.position)
 		}
 
 		if showFPS {
@@ -149,6 +140,7 @@ func main() {
 			rl.DrawText(s, 5, 5, 30, rl.Green)
 		}
 
+		rl.EndMode2D()
 		rl.EndDrawing()
 	}
 }
