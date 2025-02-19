@@ -2,27 +2,67 @@ package game
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+	//"fmt"
 )
 
 const (
-	minSpeed = 5.0
-	growthRate = 1.0
-	speedDecay = 0.99
+	MinSpeed = 5.0
+	GrowthRate = 1.0
+	SpeedDecay = 0.99
+	//BackgroundImagePath = "../../assets/background.png"
+	BackgroundImagePath = "C:/Users/david/Documents/go/agario/agario/assets/background.png"
+	//BackgroundImagePath = "../assets/background.png"
 )
+
+//var backgroundImage rl.Texture2D = rl.LoadTexture("../../assets/background.png")
+
 
 var WorldDimensions = rl.Vector2{
 		X: 1920 * 3,
 		Y: 1080 * 3,
 }
-
-type GameState struct {
-	FoodPositions []Food
-	PlayerPositions []Player
+var WindowDimensions = rl.Vector2{
+		X: 1920,
+		Y: 1080,
 }
 
-var GS GameState
+
+type GameState struct {
+	FoodPositions []Food		`json:"FoodsPositions"`
+	PlayerPositions []Player	`json:"PlayerPositions"`
+}
+
+func (g *GameState) SpawnFood() {
+	for _,v := range g.FoodPositions{
+		rl.DrawCircle(int32(v.Position.X), int32(v.Position.Y), v.Radius, rl.Green)
+		//fmt.Println(v.Radius)
+	}
+}
+
+func DrawWorld(b rl.Texture2D) {
+	tilesX := WorldDimensions.X / 320
+	tilesY := WorldDimensions.Y / 180
+
+	for i := int32(0); i < int32(tilesX); i++ {
+		x := int32(320 * i)
+		for j:= int32(0); j < int32(tilesY); j++ {
+			y := int32(180 * j)
+			rl.DrawTexture(b, x, y, rl.White)
+		}
+	}
+}
 
 
 func PlayerFoodCollision(f Food, p Player) bool {
 	return rl.CheckCollisionCircles(f.Position, f.Radius, p.Position, p.Radius)
+}
+
+func SetupCamera(p Player) rl.Camera2D {
+	c := rl.Camera2D{
+		Offset: rl.Vector2{X: WindowDimensions.X / 2, Y: WindowDimensions.Y / 2},
+		Target: p.Position,
+		Rotation: 0.0,
+		Zoom: 1.0,
+	}
+	return c
 }
