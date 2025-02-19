@@ -9,6 +9,9 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+
+	"github.com/DavidinhoHD/agario/internal/game"
 )
 
 // World dimensions defined as multiples of the window size
@@ -20,6 +23,8 @@ const (
     speedDecay  = 0.99    // Speed multiplier when eating food (0.99 = 1% slower)
 )
 
+/*
+
 // Player represents the user-controlled entity in the game
 type Player struct {
     radius      float32    // Size of the player circle
@@ -27,6 +32,8 @@ type Player struct {
     speed       float32    // Movement speed
     lastDrawPos rl.Vector2 // Previous position for smooth rendering
 }
+
+*/
 
 // Food represents collectible items that increase player size
 type Food struct {
@@ -39,6 +46,8 @@ type GameState struct {
     foods []Food    // Slice containing all food items
     mutex sync.Mutex // Mutex for thread-safe food operations
 }
+
+/*
 
 // DrawPlayer renders the player at the center of the screen
 // The camera follows the player, making it appear stationary
@@ -82,6 +91,8 @@ func (p *Player) Move(mousePos rl.Vector2, speed float32) {
 	}
 }
 
+*/
+
 // spawnFood creates a new food item at a random position within the world bounds
 func spawnFood() Food {
 	var f Food
@@ -109,8 +120,8 @@ func spawnFoodTicker(state *GameState) {
 }
 
 // foodPlayerCollision checks if a player has collided with a food item
-func foodPlayerCollision(food Food, player Player) bool {
-	return rl.CheckCollisionCircles(food.position, food.radius, player.position, player.radius)
+func foodPlayerCollision(food Food, player game.Player) bool {
+	return rl.CheckCollisionCircles(food.position, food.radius, player.Position, player.Radius)
 }
 
 func main() {
@@ -128,12 +139,12 @@ func main() {
 	rl.SetTargetFPS(60)
 
     // Create player at the center of the world
-	player := Player{
-		radius:   30.0,
-		position: rl.Vector2{X: float32(worldWidth) / 2, Y: float32(worldHeight) / 2},
-		speed:    15,
+	player := game.Player{
+		Radius:   30.0,
+		Position: rl.Vector2{X: float32(worldWidth) / 2, Y: float32(worldHeight) / 2},
+		Speed:    15,
 	}
-	player.lastDrawPos = player.position
+	player.LastDrawPos = player.Position
 
     // Initialize game state and food system
 	gameState := &GameState{
@@ -164,7 +175,7 @@ func main() {
         // Setup camera to follow player
 		camera := rl.Camera2D{
 			Offset:   rl.Vector2{X: float32(windowWidth) / 2, Y: float32(windowHeight) / 2},
-			Target:   player.position,
+			Target:   player.Position,
 			Rotation: 0.0,
 			Zoom:     1.0,
 		}
@@ -190,8 +201,8 @@ func main() {
             rl.DrawCircle(int32(food.position.X), int32(food.position.Y), food.radius, rl.Green)
             if foodPlayerCollision(food, player) {
                 // Smoother growth and speed adjustment
-                player.radius += growthRate
-                player.speed = float32(math.Max(float64(player.speed*speedDecay), minSpeed))
+                player.Radius += growthRate
+                player.Speed = float32(math.Max(float64(player.Speed*speedDecay), minSpeed))
                 gameState.foods = append(gameState.foods[:i], gameState.foods[i+1:]...)
                 i--
             }
@@ -205,7 +216,7 @@ func main() {
 
 		if rl.IsCursorOnScreen() {
 			mouseWorldPos := rl.GetScreenToWorld2D(rl.GetMousePosition(), camera)
-			player.Move(mouseWorldPos, player.speed)
+			player.Move(mouseWorldPos, player.Speed)
 		}
 
 		if showFPS {
