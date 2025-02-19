@@ -96,7 +96,7 @@ func (p *Player) Move(mousePos rl.Vector2, speed float32) {
 
 */
 
-// spawngame.Food creates a new food item at a random position within the world bounds
+// spawnFood creates a new food item at a random position within the world bounds
 func spawnFood() game.Food {
 	var f game.Food
 	x := rand.Int31n(worldWidth)
@@ -109,7 +109,7 @@ func spawnFood() game.Food {
 	return f
 }
 
-// spawngame.FoodTicker periodically spawns new food items in a separate goroutine
+// spawnFoodTicker periodically spawns new food items in a separate goroutine
 // Uses mutex to ensure thread-safe modification of the foods slice
 func spawnFoodTicker(state *GameState) {
     ticker := time.NewTicker(2 * time.Second) // Spawn food every 2 seconds
