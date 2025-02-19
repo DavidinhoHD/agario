@@ -35,15 +35,18 @@ type Player struct {
 
 */
 
-// Food represents collectible items that increase player size
-type Food struct {
+/*
+// game.Food represents collectible items that increase player size
+type game.Food struct {
     radius   float32    // Size of the food circle
     position rl.Vector2 // Position in the world
 }
 
+*/
+
 // GameState manages the game's mutable state with thread-safe access
 type GameState struct {
-    foods []Food    // Slice containing all food items
+    foods []game.Food    // Slice containing all food items
     mutex sync.Mutex // Mutex for thread-safe food operations
 }
 
@@ -93,20 +96,20 @@ func (p *Player) Move(mousePos rl.Vector2, speed float32) {
 
 */
 
-// spawnFood creates a new food item at a random position within the world bounds
-func spawnFood() Food {
-	var f Food
+// spawngame.Food creates a new food item at a random position within the world bounds
+func spawnFood() game.Food {
+	var f game.Food
 	x := rand.Int31n(worldWidth)
 	y := rand.Int31n(worldHeight)
 
-	f.position.X = float32(x)
-	f.position.Y = float32(y)
-	f.radius = 10.0
+	f.Position.X = float32(x)
+	f.Position.Y = float32(y)
+	f.Radius = 10.0
 
 	return f
 }
 
-// spawnFoodTicker periodically spawns new food items in a separate goroutine
+// spawngame.FoodTicker periodically spawns new food items in a separate goroutine
 // Uses mutex to ensure thread-safe modification of the foods slice
 func spawnFoodTicker(state *GameState) {
     ticker := time.NewTicker(2 * time.Second) // Spawn food every 2 seconds
@@ -120,8 +123,8 @@ func spawnFoodTicker(state *GameState) {
 }
 
 // foodPlayerCollision checks if a player has collided with a food item
-func foodPlayerCollision(food Food, player game.Player) bool {
-	return rl.CheckCollisionCircles(food.position, food.radius, player.Position, player.Radius)
+func foodPlayerCollision(food game.Food, player game.Player) bool {
+	return rl.CheckCollisionCircles(food.Position, food.Radius, player.Position, player.Radius)
 }
 
 func main() {
@@ -148,7 +151,7 @@ func main() {
 
     // Initialize game state and food system
 	gameState := &GameState{
-        foods: make([]Food, 0),
+        foods: make([]game.Food, 0),
     }
 
     // Spawn initial food items
@@ -165,7 +168,7 @@ func main() {
 	}
 	defer rl.UnloadTexture(backgroundImage)
 
-	showFPS := false
+	showFPS := true
 
 	// Game loop
 	for !rl.WindowShouldClose() {
@@ -198,7 +201,7 @@ func main() {
 		gameState.mutex.Lock()
         for i := 0; i < len(gameState.foods); i++ {
             food := gameState.foods[i]
-            rl.DrawCircle(int32(food.position.X), int32(food.position.Y), food.radius, rl.Green)
+            rl.DrawCircle(int32(food.Position.X), int32(food.Position.Y), food.Radius, rl.Green)
             if foodPlayerCollision(food, player) {
                 // Smoother growth and speed adjustment
                 player.Radius += growthRate
