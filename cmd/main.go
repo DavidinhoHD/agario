@@ -148,7 +148,7 @@ func main() {
     // Start automatic food spawning system
     spawnFoodTicker(gameState)
 
-	backgroundImage := rl.LoadTexture("static/background.png")
+	backgroundImage := rl.LoadTexture("./assets/background.png")
 	if backgroundImage.ID == 0 {
 		fmt.Println("No background image")
 	}
