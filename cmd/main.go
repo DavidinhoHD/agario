@@ -159,7 +159,7 @@ func main() {
 	rl.InitWindow(int32(game.WindowDimensions.X), int32(game.WindowDimensions.Y), "window title")
 	defer rl.CloseWindow()
 
-	player.LastDrawPos = player.Position
+	//player.LastDrawPos = player.Position
 	/*
 	       // Create player at the center of the world
 	   	player := game.Player{
@@ -241,18 +241,24 @@ func main() {
 			return
 		}
 		gameState.SpawnFood()
+		gameState.SpawnPlayers(player)
 
 		for _, v := range gameState.FoodPositions {
 			if game.PlayerFoodCollision(v, player) {
 				api.DeleteFoodById(v)
 				player.ChangePlayerProperties()
+				api.UpdatePlayer(player)
 			}
 		}
 
 		for _, v := range gameState.PlayerPositions {
 			if game.PlayerPlayerCollision(player, v) {
-				if player.Radius > v.Radius {
+				if player.Radius > v.Radius && player.ID != v.ID {
 					api.DeletePlayerById(v)
+					player.ChangePlayerProperties()
+				}else {
+					api.DeletePlayerById(player)
+					rl.WindowShouldClose()
 				}
 			}
 		}

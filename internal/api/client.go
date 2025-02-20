@@ -9,7 +9,8 @@ import (
 
 	"github.com/DavidinhoHD/agario/internal/game"
 )
-var url string = "http://localhost:8080"
+//var url string = "http://localhost:8080"
+var url string = "http://192.168.178.2:8080"
 
 // request all current food & player positions
 func GetGameState() (game.GameState, error){
@@ -28,10 +29,7 @@ func GetGameState() (game.GameState, error){
 	if err != nil {
 		return localGameState, err
 	}
-	/*
-	x, _ := json.MarshalIndent(localGameState, "", "")
-	fmt.Println(string(x))
-	*/
+
 	return localGameState, nil
 }
 

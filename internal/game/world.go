@@ -9,9 +9,8 @@ const (
 	MinSpeed = 5.0
 	GrowthRate = 1.0
 	SpeedDecay = 0.99
-	//BackgroundImagePath = "../../assets/background.png"
-	BackgroundImagePath = "C:/Users/david/Documents/go/agario/agario/assets/background.png"
-	//BackgroundImagePath = "../assets/background.png"
+	BackgroundImagePath = "assets/background.png"
+
 )
 
 var Points int = 0
@@ -39,6 +38,17 @@ func (g *GameState) SpawnFood() {
 		//fmt.Println(v.Radius)
 	}
 }
+
+func (g *GameState) SpawnPlayers(p Player) {
+	for _,v := range g.PlayerPositions{
+		if v.ID != p.ID {
+			rl.DrawCircle(int32(v.Position.X), int32(v.Position.Y), v.Radius, rl.Blue)
+		}
+		//fmt.Println(v.Radius)
+	}
+}
+
+
 
 func DrawWorld(b rl.Texture2D) {
 	tilesX := WorldDimensions.X / 320
