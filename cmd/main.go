@@ -4,16 +4,17 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"fmt"
-	"math"
-	"math/rand"
+	//"math"
+	//"math/rand"
 	"strconv"
-	"sync"
-	"time"
+	//"sync"
+	//"time"
 
-
+	"github.com/DavidinhoHD/agario/internal/api"
 	"github.com/DavidinhoHD/agario/internal/game"
 )
 
+/*
 // World dimensions defined as multiples of the window size
 const (
     worldWidth  = 1920 * 3 // 3 times the window width
@@ -22,6 +23,8 @@ const (
     growthRate  = 1.0     // How much radius increases per food
     speedDecay  = 0.99    // Speed multiplier when eating food (0.99 = 1% slower)
 )
+
+*/
 
 /*
 
@@ -44,11 +47,14 @@ type game.Food struct {
 
 */
 
+/*
 // GameState manages the game's mutable state with thread-safe access
 type GameState struct {
     foods []game.Food    // Slice containing all food items
     mutex sync.Mutex // Mutex for thread-safe food operations
 }
+
+*/
 
 /*
 
@@ -96,6 +102,7 @@ func (p *Player) Move(mousePos rl.Vector2, speed float32) {
 
 */
 
+/*
 // spawnFood creates a new food item at a random position within the world bounds
 func spawnFood() game.Food {
 	var f game.Food
@@ -109,6 +116,9 @@ func spawnFood() game.Food {
 	return f
 }
 
+*/
+
+/*
 // spawnFoodTicker periodically spawns new food items in a separate goroutine
 // Uses mutex to ensure thread-safe modification of the foods slice
 func spawnFoodTicker(state *GameState) {
@@ -122,99 +132,150 @@ func spawnFoodTicker(state *GameState) {
     }()
 }
 
+*/
+
+/*
 // foodPlayerCollision checks if a player has collided with a food item
 func foodPlayerCollision(food game.Food, player game.Player) bool {
 	return rl.CheckCollisionCircles(food.Position, food.Radius, player.Position, player.Radius)
 }
 
+*/
+
 func main() {
-    // Initialize window and game settings
-	windowWidth := int32(1920)
-	windowHeight := int32(1080)
+	gameState, err := api.GetGameState()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	//worldWidth := int32(15000)
-	//worldHeight := int32(15000)
+	player, err := api.GetNewPlayer()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	rl.InitWindow(windowWidth, windowHeight, "window title")
+	// Initialize window and game settings
+	rl.InitWindow(int32(game.WindowDimensions.X), int32(game.WindowDimensions.Y), "window title")
 	defer rl.CloseWindow()
 
-	rl.SetExitKey(rl.KeyNull)
-	rl.SetTargetFPS(60)
-
-    // Create player at the center of the world
-	player := game.Player{
-		Radius:   30.0,
-		Position: rl.Vector2{X: float32(worldWidth) / 2, Y: float32(worldHeight) / 2},
-		Speed:    15,
-	}
 	player.LastDrawPos = player.Position
+	/*
+	       // Create player at the center of the world
+	   	player := game.Player{
+	   		Radius:   30.0,
+	   		Position: rl.Vector2{X: float32(worldWidth) / 2, Y: float32(worldHeight) / 2},
+	   		Speed:    15,
+	   	}
+	   	player.LastDrawPos = player.Position
+	*/
 
-    // Initialize game state and food system
-	gameState := &GameState{
-        foods: make([]game.Food, 0),
-    }
+	/*
+		    // Initialize game state and food system
+			gameState := &GameState{
+		        foods: make([]game.Food, 0),
+		    }
 
-    // Spawn initial food items
-    for i := 0; i < 6; i++ {
-        gameState.foods = append(gameState.foods, spawnFood())
-    }
+		    // Spawn initial food items
+		    for i := 0; i < 6; i++ {
+		        gameState.foods = append(gameState.foods, spawnFood())
+		    }
 
-    // Start automatic food spawning system
-    spawnFoodTicker(gameState)
+	*/
 
-	backgroundImage := rl.LoadTexture("./assets/background.png")
+	/*
+	   // Start automatic food spawning system
+	   spawnFoodTicker(gameState)
+
+	*/
+
+	backgroundImage := rl.LoadTexture(game.BackgroundImagePath)
 	if backgroundImage.ID == 0 {
 		fmt.Println("No background image")
+		return
 	}
 	defer rl.UnloadTexture(backgroundImage)
 
 	showFPS := true
+
+	rl.SetExitKey(rl.KeyNull)
+	rl.SetTargetFPS(60)
 
 	// Game loop
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
-        // Setup camera to follow player
-		camera := rl.Camera2D{
-			Offset:   rl.Vector2{X: float32(windowWidth) / 2, Y: float32(windowHeight) / 2},
-			Target:   player.Position,
-			Rotation: 0.0,
-			Zoom:     1.0,
-		}
+		// Setup camera to follow player
+		camera := game.SetupCamera(player)
+		/*
+			camera := rl.Camera2D{
+				Offset:   rl.Vector2{X: float32(game.WindowDimensions.X) / 2, Y: float32(game.WindowDimensions.Y) / 2},
+				Target:   player.Position,
+				Rotation: 0.0,
+				Zoom:     1.0,
+			}
+		*/
 
 		rl.BeginMode2D(camera)
 
-		// Calculate number of tiles needed for world coverage
-		tilesX := worldWidth / 320
-		tilesY := worldHeight / 180
+		/*
+			// Calculate number of tiles needed for world coverage
+			tilesX := game.WorldDimensions.X / 320
+			tilesY := game.WorldDimensions.Y / 180
 
-		for i := int32(0); i < int32(tilesX); i++ {
-			x := int32(320 * i)
-			for j := int32(0); j < int32(tilesY); j++ {
-			y := int32(180 * j)
-			rl.DrawTexture(backgroundImage, x, y, rl.White)
+			for i := int32(0); i < int32(tilesX); i++ {
+				x := int32(320 * i)
+				for j := int32(0); j < int32(tilesY); j++ {
+				y := int32(180 * j)
+				rl.DrawTexture(backgroundImage, x, y, rl.White)
+				}
+			}
+
+		*/
+
+		game.DrawWorld(backgroundImage)
+		gameState, err = api.GetGameState()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		gameState.SpawnFood()
+
+		for _, v := range gameState.FoodPositions {
+			if game.PlayerFoodCollision(v, player) {
+				api.DeleteFoodById(v)
+				player.ChangePlayerProperties()
 			}
 		}
 
-        // Thread-safe food handling and collision detection
-		gameState.mutex.Lock()
-        for i := 0; i < len(gameState.foods); i++ {
-            food := gameState.foods[i]
-            rl.DrawCircle(int32(food.Position.X), int32(food.Position.Y), food.Radius, rl.Green)
-            if foodPlayerCollision(food, player) {
-                // Smoother growth and speed adjustment
-                player.Radius += growthRate
-                player.Speed = float32(math.Max(float64(player.Speed*speedDecay), minSpeed))
-                gameState.foods = append(gameState.foods[:i], gameState.foods[i+1:]...)
-                i--
-            }
-        }
-        gameState.mutex.Unlock()
+		for _, v := range gameState.PlayerPositions {
+			if game.PlayerPlayerCollision(player, v) {
+				if player.Radius > v.Radius {
+					api.DeletePlayerById(v)
+				}
+			}
+		}
 
+		/*
+			        // Thread-safe food handling and collision detection
+					gameState.mutex.Lock()
+			        for i := 0; i < len(gameState.foods); i++ {
+			            food := gameState.foods[i]
+			            rl.DrawCircle(int32(food.Position.X), int32(food.Position.Y), food.Radius, rl.Green)
+			            if foodPlayerCollision(food, player) {
+			                // Smoother growth and speed adjustment
+			                player.Radius += growthRate
+			                player.Speed = float32(math.Max(float64(player.Speed*speedDecay), minSpeed))
+			                gameState.foods = append(gameState.foods[:i], gameState.foods[i+1:]...)
+			                i--
+			            }
+			        }
+			        gameState.mutex.Unlock()
+		*/
 		rl.EndMode2D()
 
-        // Player drawing and movement
+		// Player drawing and movement
 		player.DrawPlayer()
 
 		if rl.IsCursorOnScreen() {
@@ -228,6 +289,8 @@ func main() {
 			rl.DrawText(s, 5, 5, 30, rl.Green)
 		}
 
+		p := fmt.Sprintf("Points:%d", game.Points)
+		rl.DrawText(p, 5, 1050, 30, rl.Green)
 		rl.EndDrawing()
 	}
 }

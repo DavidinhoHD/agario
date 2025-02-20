@@ -9,7 +9,7 @@ import (
 
 	"github.com/DavidinhoHD/agario/internal/game"
 )
-var url string = "localhost:8080"
+var url string = "http://localhost:8080"
 
 // request all current food & player positions
 func GetGameState() (game.GameState, error){
@@ -28,12 +28,16 @@ func GetGameState() (game.GameState, error){
 	if err != nil {
 		return localGameState, err
 	}
-
+	/*
+	x, _ := json.MarshalIndent(localGameState, "", "")
+	fmt.Println(string(x))
+	*/
 	return localGameState, nil
 }
 
 // request a new player from the server
 func GetNewPlayer() (game.Player, error){
+	var localGameState game.GameState
 	var newPlayer game.Player
 	resp, err := http.Get(url+"/init")
 	if err != nil {
@@ -46,11 +50,11 @@ func GetNewPlayer() (game.Player, error){
 		return newPlayer, err
 	}
 
-	err  = json.Unmarshal(b, &newPlayer)
+	err  = json.Unmarshal(b, &localGameState)
 	if err != nil {
 		return newPlayer, err
 	}
-
+	newPlayer = localGameState.PlayerPositions[len(localGameState.PlayerPositions) - 1]
 	return newPlayer, nil
 }
 

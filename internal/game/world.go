@@ -14,7 +14,8 @@ const (
 	//BackgroundImagePath = "../assets/background.png"
 )
 
-//var backgroundImage rl.Texture2D = rl.LoadTexture("../../assets/background.png")
+var Points int = 0
+
 
 
 var WorldDimensions = rl.Vector2{
@@ -54,7 +55,15 @@ func DrawWorld(b rl.Texture2D) {
 
 
 func PlayerFoodCollision(f Food, p Player) bool {
-	return rl.CheckCollisionCircles(f.Position, f.Radius, p.Position, p.Radius)
+	if rl.CheckCollisionCircles(f.Position, f.Radius, p.Position, p.Radius) {
+		Points ++
+		return true
+	}
+	return false
+}
+
+func PlayerPlayerCollision(p1, p2 Player) bool {
+	return rl.CheckCollisionCircles(p1.Position, p1.Radius, p2.Position, p2.Radius)
 }
 
 func SetupCamera(p Player) rl.Camera2D {
