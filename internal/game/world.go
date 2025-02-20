@@ -2,7 +2,6 @@ package game
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	//"fmt"
 )
 
 const (
@@ -35,7 +34,6 @@ type GameState struct {
 func (g *GameState) SpawnFood() {
 	for _,v := range g.FoodPositions{
 		rl.DrawCircle(int32(v.Position.X), int32(v.Position.Y), v.Radius, rl.Green)
-		//fmt.Println(v.Radius)
 	}
 }
 
@@ -44,7 +42,6 @@ func (g *GameState) SpawnPlayers(p Player) {
 		if v.ID != p.ID {
 			rl.DrawCircle(int32(v.Position.X), int32(v.Position.Y), v.Radius, rl.Blue)
 		}
-		//fmt.Println(v.Radius)
 	}
 }
 
